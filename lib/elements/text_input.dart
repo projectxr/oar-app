@@ -3,7 +3,6 @@ import 'package:app/utils/const.dart';
 
 class TextInput extends StatelessWidget {
   final TextEditingController inputController;
-  final String? Function(String?)? validator;
   final TextInputType? keyboardType;
   final String fieldName;
   final bool obscureText;
@@ -12,7 +11,6 @@ class TextInput extends StatelessWidget {
   final EdgeInsets fieldPadding;
   TextInput(
       {required this.inputController,
-      this.validator,
       this.keyboardType,
       required this.fieldName,
       this.obscureText = false,
@@ -33,7 +31,13 @@ class TextInput extends StatelessWidget {
           Material(
             borderRadius: const BorderRadius.all(Radius.circular(TEXT_FIELD_BORDER_RADIUS)),
             elevation: TEXT_FIELD_ELEVATION,
-            child: TextFormField(
+            child: TextField(
+              textInputAction: TextInputAction.go,
+              onSubmitted: (value) {
+                if (onPressedIcon != null) {
+                  onPressedIcon!();
+                }
+              },
               cursorColor: TEXT_FIELD_CURSOR_COLOR,
               decoration: InputDecoration(
                   border: InputBorder.none,
@@ -58,7 +62,6 @@ class TextInput extends StatelessWidget {
                   fillColor: Colors.white),
               controller: inputController,
               keyboardType: keyboardType,
-              validator: validator,
               obscureText: obscureText,
             ),
           )

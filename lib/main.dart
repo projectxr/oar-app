@@ -1,9 +1,9 @@
 import 'dart:ui';
 import 'package:app/elements/text_input.dart';
-import 'package:app/utils/const.dart';
 import 'package:flutter/material.dart';
 import 'package:app/messages/generated.dart';
 import 'package:app/messages/llm.pb.dart';
+import 'package:markdown_widget/markdown_widget.dart';
 
 void main() async {
   await initializeRust();
@@ -21,12 +21,17 @@ class _MyAppState extends State<MyApp> {
   late TextEditingController _promptController;
   late Map<int, String> messages = Map.from({0: ""});
   int currentMessageId = 0;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    print("HELLO 123");
     _promptController = TextEditingController();
+    LlmReady.rustSignalStream.listen((readyData) {
+      if (readyData.message.ready) {
+        LlmRequest(prompt: "Hello").sendSignalToRust();
+      }
+    });
   }
 
   final _appLifecycleListener = AppLifecycleListener(
@@ -56,9 +61,11 @@ class _MyAppState extends State<MyApp> {
       home: Scaffold(
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               child: SingleChildScrollView(
+                controller: _scrollController,
                 child: StreamBuilder(
                   stream: LlmResult.rustSignalStream,
                   builder: (context, snapshot) {
@@ -73,9 +80,17 @@ class _MyAppState extends State<MyApp> {
                     }
 
                     messages.update(
-                        llmResponse.messageId, (currVal) => '$currVal ${llmResponse.response}');
+                        llmResponse.messageId, (currVal) => '$currVal${llmResponse.response}');
+                    _scrollController.animateTo(
+                      _scrollController.position.maxScrollExtent,
+                      duration: Duration(milliseconds: 500),
+                      curve: Curves.easeOut,
+                    );
                     return Column(
-                      children: messages.entries.map((element) => Text(element.value)).toList(),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: messages.entries
+                          .map((element) => MarkdownBlock(data: element.value))
+                          .toList(),
                     );
                   },
                 ),

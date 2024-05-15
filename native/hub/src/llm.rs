@@ -1,4 +1,5 @@
 use crate::messages;
+use crate::messages::llm::LlmReady;
 use crate::tokio;
 use anyhow::Result;
 use llama_cpp_2::context::params::LlamaContextParams;
@@ -53,6 +54,7 @@ pub async fn parse() {
     let model = LlamaModel::load_from_file(&backend, model_path, &model_params)
         .expect("Unable to load models");
     println!("Loaded!");
+    messages::llm::LlmReady { ready: true }.send_signal_to_dart();
     let mut message_id: u32 = 0;
     let mut receiver = messages::llm::LlmRequest::get_dart_signal_receiver();
     tokio::spawn(async move {

@@ -1,6 +1,12 @@
 syntax = "proto3";
 package llm;
 
+// [RINF:RUST-SIGNAL]
+message LlmReady {
+  bool ready = 1;
+}
+
+
 // [RINF:DART-SIGNAL]
 message LlmRequest {
   string prompt = 1;

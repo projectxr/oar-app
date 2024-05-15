@@ -89,7 +89,12 @@ class _MyAppState extends State<MyApp> {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: messages.entries
-                          .map((element) => MarkdownBlock(data: element.value))
+                          .map((element) => MarkdownBlock(
+                                data: element.value,
+                                config: Theme.of(context).brightness == Brightness.dark
+                                    ? MarkdownConfig.darkConfig
+                                    : MarkdownConfig.defaultConfig,
+                              ))
                           .toList(),
                     );
                   },

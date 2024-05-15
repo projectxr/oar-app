@@ -10,6 +10,7 @@ use llama_cpp_2::model::params::LlamaModelParams;
 use llama_cpp_2::model::LlamaModel;
 use llama_cpp_2::model::{AddBos, Special};
 use llama_cpp_2::token::data_array::LlamaTokenDataArray;
+use llama_cpp_2::token::LlamaToken;
 use std::io::Write;
 use std::num::NonZeroU32;
 use std::path::PathBuf;
@@ -58,6 +59,7 @@ pub async fn parse() {
     let mut message_id: u32 = 0;
     let mut receiver = messages::llm::LlmRequest::get_dart_signal_receiver();
     tokio::spawn(async move {
+        let mut sampling_token_list: Vec<LlamaToken> = vec![];
         while let Some(app_request) = receiver.recv().await {
             let prompt: String = app_request.message.prompt;
             let prompt: String = [
@@ -78,9 +80,11 @@ pub async fn parse() {
             let tokens_list = model
                 .str_to_token(&prompt, AddBos::Always)
                 .expect(format!("failed to tokenize {prompt}").as_str());
+            sampling_token_list.append(&mut tokens_list.clone());
 
             let n_cxt = ctx.n_ctx() as i32;
-            let n_kv_req = tokens_list.len() as i32 + (n_len - tokens_list.len() as i32);
+            let n_kv_req =
+                sampling_token_list.len() as i32 + (n_len - sampling_token_list.len() as i32);
 
             eprintln!("n_len = {n_len}, n_ctx = {n_cxt}, k_kv_req = {n_kv_req}");
 
@@ -88,25 +92,25 @@ pub async fn parse() {
                 break;
             }
 
-            if tokens_list.len() >= usize::try_from(n_len).expect("Length not available") {
+            if sampling_token_list.len() >= usize::try_from(n_len).expect("Length not available") {
                 eprintln!("the prompt is too long, it has more tokens than n_len");
                 break;
             }
 
-            for token in &tokens_list {
-                eprint!(
-                    "{}",
-                    model
-                        .token_to_str(*token, Special::Tokenize)
-                        .expect("Error in converting from token to str")
-                );
-            }
+            // for token in &sampling_token_list {
+            //     eprint!(
+            //         "{}",
+            //         model
+            //             .token_to_str(*token, Special::Tokenize)
+            //             .expect("Error in converting from token to str")
+            //     );
+            // }
 
             std::io::stderr().flush().expect("Flush error");
-            let mut batch = LlamaBatch::new(2048, 1);
+            let mut batch = LlamaBatch::new(4096, 1);
 
-            let last_index: i32 = (tokens_list.len() - 1) as i32;
-            for (i, token) in (0_i32..).zip(tokens_list.into_iter()) {
+            let last_index: i32 = (sampling_token_list.len() - 1) as i32;
+            for (i, token) in (0_i32..).zip(sampling_token_list.clone().into_iter()) {
                 let is_last = i == last_index;
                 batch
                     .add(token, i, &[0], is_last)
@@ -127,9 +131,8 @@ pub async fn parse() {
 
                     let candidates_p = LlamaTokenDataArray::from_iter(candidates, false);
 
-                    // sample the most likely token
                     let new_token_id = ctx.llama_sample_token_mirostat_v2(candidates_p);
-
+                    sampling_token_list.push(new_token_id);
                     if new_token_id == model.token_eos() {
                         eprintln!();
                         break;

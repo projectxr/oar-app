@@ -1,0 +1,29 @@
+# This file is used for telling Rust-related tools
+# where various Rust crates are.
+# This also unifies `./target` output folder and
+# various Rust configurations.
+
+[workspace]
+members = ["./native/*"]
+resolver = "2"
+
+[workspace.dependencies]
+# core library deps
+thiserror = "1"
+tracing = "0.1"
+
+# examples and benchmarks
+criterion = "0.5.1"
+pprof = "0.13.0"
+bindgen = "0.69.4"
+cc = "1.0.94"
+anyhow = "1.0.82"
+clap = "4.5.4"
+encoding_rs = "0.8.34"
+
+[workspace.lints.rust]
+missing_docs = { level = "warn" }
+missing_debug_implementations = { level = "warn" }
+
+[workspace.lints.clippy]
+pedantic = { level = "warn"  }

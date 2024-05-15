@@ -1,0 +1,15 @@
+syntax = "proto3";
+package llm;
+
+// [RINF:DART-SIGNAL]
+message LlmRequest {
+  string prompt = 1;
+  uint32 messageId = 2;
+}
+
+// [RINF:RUST-SIGNAL]
+message LlmResult {
+  string response = 1;
+  uint32 messageId = 2;
+}
+

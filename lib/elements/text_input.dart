@@ -9,13 +9,16 @@ class TextInput extends StatelessWidget {
   final IconData? icon;
   final Function()? onPressedIcon;
   final EdgeInsets fieldPadding;
-  TextInput(
-      {required this.inputController,
+  final bool enabled;
+  const TextInput(
+      {super.key,
+      required this.inputController,
       this.keyboardType,
       required this.fieldName,
       this.obscureText = false,
       this.icon,
       this.onPressedIcon,
+      required this.enabled,
       this.fieldPadding = FORM_PADDING});
   @override
   Widget build(BuildContext context) {
@@ -24,7 +27,7 @@ class TextInput extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Enter $fieldName'),
+          //Text('Enter $fieldName'),
           const SizedBox(
             height: V_SMALL_PAD,
           ),
@@ -32,9 +35,10 @@ class TextInput extends StatelessWidget {
             borderRadius: const BorderRadius.all(Radius.circular(TEXT_FIELD_BORDER_RADIUS)),
             elevation: TEXT_FIELD_ELEVATION,
             child: TextField(
+              enabled: enabled,
               textInputAction: TextInputAction.go,
               onSubmitted: (value) {
-                if (onPressedIcon != null) {
+                if (onPressedIcon != null && enabled) {
                   onPressedIcon!();
                 }
               },

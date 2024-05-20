@@ -47,6 +47,7 @@ include = [
 
 [build-dependencies]
 bindgen = { workspace = true }
+build-target = { workspace = true }
 cc = { workspace = true, features = ["parallel"] }
 
 [features]

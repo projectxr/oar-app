@@ -4,6 +4,7 @@ use crate::tokio;
 use anyhow::Result;
 use llama_cpp_2::context::params::LlamaContextParams;
 //use llama_cpp_2::ggml_time_us;
+use build_target::Os;
 use llama_cpp_2::llama_backend::LlamaBackend;
 use llama_cpp_2::llama_batch::LlamaBatch;
 use llama_cpp_2::model::params::LlamaModelParams;
@@ -31,13 +32,14 @@ impl Model {
 }
 
 pub async fn parse() {
-    let n_len = 1000;
+    let n_len = 8192;
     let model: Model = Model::Local {
         path: PathBuf::from(
             "/Users/prashantchoudhary/Library/Containers/com.example.app/Data/llama.gguf",
+            //"/storage/emulated/0/Download/llama.gguf",
         ),
     };
-    let ctx_size: Option<NonZeroU32> = NonZeroU32::new(4096);
+    let ctx_size: Option<NonZeroU32> = NonZeroU32::new(8192);
     // init LLM
     let backend = LlamaBackend::init().expect("Failed to Initiate Backend");
     let model_params = {
@@ -50,12 +52,15 @@ pub async fn parse() {
         #[cfg(not(feature = "cublas"))]
         LlamaModelParams::default()
     };
-
     let model_path = model.get_or_load().expect("failed to get model from args");
     let model = LlamaModel::load_from_file(&backend, model_path, &model_params)
         .expect("Unable to load models");
     println!("Loaded!");
-    messages::llm::LlmReady { ready: true }.send_signal_to_dart();
+    messages::llm::LlmReady {
+        ready: true,
+        data: String::from("Loaded!"),
+    }
+    .send_signal_to_dart();
     let mut message_id: u32 = 0;
     let mut receiver = messages::llm::LlmRequest::get_dart_signal_receiver();
     tokio::spawn(async move {
@@ -92,10 +97,10 @@ pub async fn parse() {
                 break;
             }
 
-            if sampling_token_list.len() >= usize::try_from(n_len).expect("Length not available") {
-                eprintln!("the prompt is too long, it has more tokens than n_len");
-                break;
-            }
+            // if sampling_token_list.len() >= usize::try_from(n_len).expect("Length not available") {
+            //     eprintln!("the prompt is too long, it has more tokens than n_len");
+            //     break;
+            // }
 
             // for token in &sampling_token_list {
             //     eprint!(
@@ -133,7 +138,7 @@ pub async fn parse() {
 
                     let new_token_id = ctx.llama_sample_token_mirostat_v2(candidates_p);
                     sampling_token_list.push(new_token_id);
-                    if new_token_id == model.token_eos() {
+                    if new_token_id == model.token_eos() || new_token_id == model.token_eot() {
                         eprintln!();
                         break;
                     }

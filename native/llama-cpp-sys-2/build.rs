@@ -1,3 +1,5 @@
+use build_target;
+use build_target::Os;
 use std::env;
 use std::ffi::OsStr;
 use std::path::Path;
@@ -5,6 +7,7 @@ use std::path::PathBuf;
 
 fn main() {
     println!("cargo:rerun-if-changed=llama.cpp");
+    let current_os = build_target::target_os().unwrap();
 
     let cublas_enabled = env::var("CARGO_FEATURE_CUBLAS").is_ok();
 
@@ -125,17 +128,20 @@ fn main() {
         } else if cfg!(target_arch = "aarch64")
             && (compiler.is_like_clang() || compiler.is_like_gnu())
         {
-            if cfg!(target_os = "macos") {
+            if current_os == Os::MacOs {
                 build.flag("-mcpu=apple-m1");
+            } else if current_os == Os::Android {
+                build.flag("-mcpu=generic");
             } else if env::var("HOST") == env::var("TARGET") {
                 build.flag("-mcpu=native");
             }
+            //Todo: Merge build script for openblas and android
+
             build.flag("-pthread");
         }
     }
-
     // https://github.com/ggerganov/llama.cpp/blob/191221178f51b6e81122c5bda0fd79620e547d07/Makefile#L133-L141
-    if cfg!(target_os = "macos") {
+    if current_os == Os::MacOs {
         assert!(!cublas_enabled, "CUBLAS is not supported on macOS");
 
         let metal_enabled = env::var("CARGO_FEATURE_METAL").is_ok();
@@ -219,10 +225,19 @@ fn main() {
 
     println!("cargo:rerun-if-changed={header}");
 
+    let additional_args = if current_os == Os::Android {
+        ["--target=arm64-v8a",
+        "-I/Users/prashantchoudhary/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/aarch64-linux-android/",
+        "--sysroot=/Users/prashantchoudhary/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64/sysroot"]
+    } else {
+        ["", "", ""]
+    };
+
     let bindings = bindgen::builder()
         .header(header)
         .clang_arg("-xc++")
         .clang_arg("-std=c++11")
+        .clang_args(additional_args)
         .derive_partialeq(true)
         .no_debug("llama_grammar_element")
         .prepend_enum_name(false)

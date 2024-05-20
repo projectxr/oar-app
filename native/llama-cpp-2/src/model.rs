@@ -101,6 +101,13 @@ impl LlamaModel {
         LlamaToken(token)
     }
 
+    /// Get the end of stream token.
+    #[must_use]
+    pub fn token_eot(&self) -> LlamaToken {
+        let token = unsafe { llama_cpp_sys_2::llama_token_eot(self.model.as_ptr()) };
+        LlamaToken(token)
+    }
+
     /// Get the newline token.
     #[must_use]
     pub fn token_nl(&self) -> LlamaToken {

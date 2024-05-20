@@ -4,6 +4,7 @@ package llm;
 // [RINF:RUST-SIGNAL]
 message LlmReady {
   bool ready = 1;
+  string data = 2;
 }
 
 

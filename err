@@ -1,0 +1,129 @@
+[31mSEVERE: ================================================================================[39m
+[31mSEVERE: Cargokit BuildTool failed with error:[39m
+[31mSEVERE: --------------------------------------------------------------------------------[39m
+[31mSEVERE: External Command: rustup "run" "stable" "cargo" "build" "--manifest-path" "/Users/prashantchoudhary/code/oar/app/native/hub/Cargo.toml" "-p" "hub" "--target" "aarch64-linux-android" "--target-dir" "/Users/prashantchoudhary/code/oar/app/build/rinf/build"[39m
+[31mSEVERE: Returned Exit Code: 101[39m
+[31mSEVERE: --------------------------------------------------------------------------------[39m
+[31mSEVERE: STDOUT:[39m
+[31mSEVERE: --------------------------------------------------------------------------------[39m
+[31mSEVERE: STDERR:[39m
+[31mSEVERE: Compiling llama-cpp-sys-2 v0.1.52 (/Users/prashantchoudhary/code/oar/app/native/llama-cpp-sys-2)[39m
+[31mSEVERE: error: failed to run custom build command for `llama-cpp-sys-2 v0.1.52 (/Users/prashantchoudhary/code/oar/app/native/llama-cpp-sys-2)`[39m
+[31mSEVERE: [39m
+[31mSEVERE: Caused by:[39m
+[31mSEVERE:   process didn't exit successfully: `/Users/prashantchoudhary/code/oar/app/build/rinf/build/debug/build/llama-cpp-sys-2-46b6bb580b00b04e/build-script-build` (exit status: 101)[39m
+[31mSEVERE:   --- stdout[39m
+[31mSEVERE:   cargo:rerun-if-changed=llama.cpp[39m
+[31mSEVERE:   OPT_LEVEL = Some("0")[39m
+[31mSEVERE:   TARGET = Some("aarch64-linux-android")[39m
+[31mSEVERE:   HOST = Some("aarch64-apple-darwin")[39m
+[31mSEVERE:   cargo:rerun-if-env-changed=CC_aarch64-linux-android[39m
+[31mSEVERE:   CC_aarch64-linux-android = Some("/Users/prashantchoudhary/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang")[39m
+[31mSEVERE:   cargo:rerun-if-env-changed=CC_ENABLE_DEBUG_OUTPUT[39m
+[31mSEVERE:   cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS[39m
+[31mSEVERE:   CRATE_CC_NO_DEFAULTS = None[39m
+[31mSEVERE:   DEBUG = Some("true")[39m
+[31mSEVERE:   cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android[39m
+[31mSEVERE:   CFLAGS_aarch64-linux-android = Some("--target=aarch64-linux-android23")[39m
+[31mSEVERE:   OPT_LEVEL = Some("0")[39m
+[31mSEVERE:   TARGET = Some("aarch64-linux-android")[39m
+[31mSEVERE:   HOST = Some("aarch64-apple-darwin")[39m
+[31mSEVERE:   cargo:rerun-if-env-changed=CXX_aarch64-linux-android[39m
+[31mSEVERE:   CXX_aarch64-linux-android = Some("/Users/prashantchoudhary/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++")[39m
+[31mSEVERE:   cargo:rerun-if-env-changed=CC_ENABLE_DEBUG_OUTPUT[39m
+[31mSEVERE:   cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS[39m
+[31mSEVERE:   CRATE_CC_NO_DEFAULTS = None[39m
+[31mSEVERE:   DEBUG = Some("true")[39m
+[31mSEVERE:   cargo:rerun-if-env-changed=CXXFLAGS_aarch64-linux-android[39m
+[31mSEVERE:   CXXFLAGS_aarch64-linux-android = Some("--target=aarch64-linux-android23")[39m
+[31mSEVERE:   cargo:rustc-link-lib=framework=Foundation[39m
+[31mSEVERE:   cargo:rustc-link-lib=framework=Accelerate[39m
+[31mSEVERE:   exit status: 0[39m
+[31mSEVERE:   exit status: 0[39m
+[31mSEVERE:   exit status: 0[39m
+[31mSEVERE:   exit status: 0[39m
+[31mSEVERE:   cargo:rerun-if-env-changed=AR_aarch64-linux-android[39m
+[31mSEVERE:   AR_aarch64-linux-android = Some("/Users/prashantchoudhary/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-ar")[39m
+[31mSEVERE:   cargo:rerun-if-env-changed=ARFLAGS_aarch64-linux-android[39m
+[31mSEVERE:   ARFLAGS_aarch64-linux-android = None[39m
+[31mSEVERE:   cargo:rerun-if-env-changed=ARFLAGS_aarch64_linux_android[39m
+[31mSEVERE:   ARFLAGS_aarch64_linux_android = None[39m
+[31mSEVERE:   cargo:rerun-if-env-changed=TARGET_ARFLAGS[39m
+[31mSEVERE:   TARGET_ARFLAGS = None[39m
+[31mSEVERE:   cargo:rerun-if-env-changed=ARFLAGS[39m
+[31mSEVERE:   ARFLAGS = None[39m
+[31mSEVERE:   cargo:rustc-link-lib=static=ggml[39m
+[31mSEVERE:   cargo:rustc-link-search=native=/Users/prashantchoudhary/code/oar/app/build/rinf/build/aarch64-linux-android/debug/build/llama-cpp-sys-2-61b4c202f82019f4/out[39m
+[31mSEVERE:   exit status: 0[39m
+[31mSEVERE:   exit status: 0[39m
+[31mSEVERE:   exit status: 0[39m
+[31mSEVERE:   cargo:rerun-if-env-changed=AR_aarch64-linux-android[39m
+[31mSEVERE:   AR_aarch64-linux-android = Some("/Users/prashantchoudhary/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-ar")[39m
+[31mSEVERE:   cargo:rerun-if-env-changed=ARFLAGS_aarch64-linux-android[39m
+[31mSEVERE:   ARFLAGS_aarch64-linux-android = None[39m
+[31mSEVERE:   cargo:rerun-if-env-changed=ARFLAGS_aarch64_linux_android[39m
+[31mSEVERE:   ARFLAGS_aarch64_linux_android = None[39m
+[31mSEVERE:   cargo:rerun-if-env-changed=TARGET_ARFLAGS[39m
+[31mSEVERE:   TARGET_ARFLAGS = None[39m
+[31mSEVERE:   cargo:rerun-if-env-changed=ARFLAGS[39m
+[31mSEVERE:   ARFLAGS = None[39m
+[31mSEVERE:   cargo:rustc-link-lib=static=llama[39m
+[31mSEVERE:   cargo:rustc-link-search=native=/Users/prashantchoudhary/code/oar/app/build/rinf/build/aarch64-linux-android/debug/build/llama-cpp-sys-2-61b4c202f82019f4/out[39m
+[31mSEVERE:   cargo:rerun-if-env-changed=CXXSTDLIB_aarch64-linux-android[39m
+[31mSEVERE:   CXXSTDLIB_aarch64-linux-android = None[39m
+[31mSEVERE:   cargo:rerun-if-env-changed=CXXSTDLIB_aarch64_linux_android[39m
+[31mSEVERE:   CXXSTDLIB_aarch64_linux_android = None[39m
+[31mSEVERE:   cargo:rerun-if-env-changed=TARGET_CXXSTDLIB[39m
+[31mSEVERE:   TARGET_CXXSTDLIB = None[39m
+[31mSEVERE:   cargo:rerun-if-env-changed=CXXSTDLIB[39m
+[31mSEVERE:   CXXSTDLIB = None[39m
+[31mSEVERE:   cargo:rustc-link-lib=c++_shared[39m
+[31mSEVERE:   cargo:rerun-if-changed=llama.cpp/llama.h[39m
+[31mSEVERE: [39m
+[31mSEVERE:   --- stderr[39m
+[31mSEVERE:   compiling ggml[39m
+[31mSEVERE:   compiled ggml[39m
+[31mSEVERE:   compiling llama[39m
+[31mSEVERE:   compiled llama[39m
+[31mSEVERE:   /Users/prashantchoudhary/Library/Android/sdk/ndk/23.1.7779620//toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/linux/types.h:21:10: fatal error: 'asm/types.h' file not found[39m
+[31mSEVERE:   thread 'main' panicked at native/llama-cpp-sys-2/build.rs:233:10:[39m
+[31mSEVERE:   failed to generate bindings for llama.cpp: ClangDiagnostic("/Users/prashantchoudhary/Library/Android/sdk/ndk/23.1.7779620//toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/linux/types.h:21:10: fatal error: 'asm/types.h' file not found\n")[39m
+[31mSEVERE:   note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace[39m
+[31mSEVERE: --------------------------------------------------------------------------------[39m
+[31mSEVERE: #0      runCommand (package:build_tool/src/util.dart:118:5)[39m
+[31mSEVERE: #1      RustBuilder.build (package:build_tool/src/builder.dart:139:5)[39m
+[31mSEVERE: <asynchronous suspension>[39m
+[31mSEVERE: #2      ArtifactProvider.getArtifacts (package:build_tool/src/artifacts_provider.dart:68:25)[39m
+[31mSEVERE: <asynchronous suspension>[39m
+[31mSEVERE: #3      BuildGradle.build (package:build_tool/src/build_gradle.dart:32:23)[39m
+[31mSEVERE: <asynchronous suspension>[39m
+[31mSEVERE: #4      BuildGradleCommand.runBuildCommand (package:build_tool/src/build_tool.dart:62:5)[39m
+[31mSEVERE: <asynchronous suspension>[39m
+[31mSEVERE: #5      BuildCommand.run (package:build_tool/src/build_tool.dart:34:5)[39m
+[31mSEVERE: <asynchronous suspension>[39m
+[31mSEVERE: #6      CommandRunner.runCommand (package:args/command_runner.dart:212:13)[39m
+[31mSEVERE: <asynchronous suspension>[39m
+[31mSEVERE: #7      runMain (package:build_tool/src/build_tool.dart:248:5)[39m
+[31mSEVERE: <asynchronous suspension>[39m
+[31mSEVERE: --------------------------------------------------------------------------------[39m
+[31mSEVERE: BuildTool arguments: [build-gradle][39m
+[31mSEVERE: ================================================================================[39m
+
+[31mFAILURE: Build failed with an exception.[39m
+
+[31m* Where:[39m
+[31mScript '/Users/prashantchoudhary/.pub-cache/hosted/pub.dev/rinf-6.8.0/cargokit/gradle/plugin.gradle' line: 59[39m
+
+[31m* What went wrong:[39m
+[31mExecution failed for task ':rinf:cargokitCargoBuildHubDebug'.[39m
+[31m> Process 'command '/Users/prashantchoudhary/.pub-cache/hosted/pub.dev/rinf-6.8.0/cargokit/gradle/../run_build_tool.sh'' finished with non-zero exit value 1[39m
+
+[31m* Try:[39m
+[31m> Run with --stacktrace option to get the stack trace.[39m
+[31m> Run with --info or --debug option to get more log output.[39m
+[31m> Run with --scan to get full insights.[39m
+
+[31m* Get more help at https://help.gradle.org[39m
+
+[31mBUILD FAILED in 8s[39m
+[31mError: Gradle task assembleDebug failed with exit code 1[39m

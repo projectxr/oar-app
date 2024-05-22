@@ -35,8 +35,8 @@ pub async fn parse() {
     let n_len = 8192;
     let model: Model = Model::Local {
         path: PathBuf::from(
-            "/Users/prashantchoudhary/Library/Containers/com.example.app/Data/llama.gguf",
-            //"/storage/emulated/0/Download/llama.gguf",
+            //"/Users/prashantchoudhary/Library/Containers/com.example.app/Data/llama.gguf",
+            "/storage/emulated/0/llama.gguf",
         ),
     };
     let ctx_size: Option<NonZeroU32> = NonZeroU32::new(8192);

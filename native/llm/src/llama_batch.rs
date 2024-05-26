@@ -1,7 +1,7 @@
 //! Safe wrapper around `llama_batch`.
 
 use crate::token::LlamaToken;
-use llama_cpp_sys_2::{llama_batch, llama_batch_free, llama_batch_init, llama_pos, llama_seq_id};
+use llm_cpp::{llama_batch, llama_batch_free, llama_batch_init, llama_pos, llama_seq_id};
 
 /// A safe wrapper around `llama_batch`.
 #[derive(Debug)]
@@ -10,7 +10,7 @@ pub struct LlamaBatch {
     allocated: usize,
     /// The logits that are initialized. Used by [`LlamaContext`] to ensure that only initialized logits are accessed.
     pub(crate) initialized_logits: Vec<i32>,
-    /// The llama_cpp batch. always initialize by `llama_cpp_sys_2::llama_batch_init(allocated, <unknown>, <unknown>)`
+    /// The llama_cpp batch. always initialize by `llm_cpp::llama_batch_init(allocated, <unknown>, <unknown>)`
     pub(crate) llama_batch: llama_batch,
 }
 
@@ -160,7 +160,7 @@ impl Drop for LlamaBatch {
     /// Drops the `LlamaBatch`.
     ///
     /// ```
-    /// # use llama_cpp_2::llama_batch::LlamaBatch;
+    /// # use llm::llama_batch::LlamaBatch;
     /// # use std::error::Error;
     /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let batch = LlamaBatch::new(512, 1);

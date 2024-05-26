@@ -2,7 +2,7 @@
 use crate::context::LlamaContext;
 use crate::token::data::LlamaTokenData;
 use crate::token::LlamaToken;
-use llama_cpp_sys_2::llama_token;
+use llm_cpp::llama_token;
 use std::cmp::min;
 use std::ptr;
 
@@ -20,9 +20,9 @@ impl LlamaTokenDataArray {
     /// Create a new `LlamaTokenDataArray` from a vector and weather or not the data is sorted.
     ///
     /// ```
-    /// # use llama_cpp_2::token::data::LlamaTokenData;
-    /// # use llama_cpp_2::token::data_array::LlamaTokenDataArray;
-    /// # use llama_cpp_2::token::LlamaToken;
+    /// # use llm::token::data::LlamaTokenData;
+    /// # use llm::token::data_array::LlamaTokenDataArray;
+    /// # use llm::token::LlamaToken;
     /// let array = LlamaTokenDataArray::new(vec![
     ///         LlamaTokenData::new(LlamaToken(0), 0.0, 0.0),
     ///         LlamaTokenData::new(LlamaToken(1), 0.1, 0.1)
@@ -37,9 +37,9 @@ impl LlamaTokenDataArray {
 
     /// Create a new `LlamaTokenDataArray` from an iterator and weather or not the data is sorted.
     /// ```
-    /// # use llama_cpp_2::token::data::LlamaTokenData;
-    /// # use llama_cpp_2::token::data_array::LlamaTokenDataArray;
-    /// # use llama_cpp_2::token::LlamaToken;
+    /// # use llm::token::data::LlamaTokenData;
+    /// # use llm::token::data_array::LlamaTokenDataArray;
+    /// # use llm::token::LlamaToken;
     /// let array = LlamaTokenDataArray::from_iter([
     ///     LlamaTokenData::new(LlamaToken(0), 0.0, 0.0),
     ///     LlamaTokenData::new(LlamaToken(1), 0.1, 0.1)
@@ -67,11 +67,11 @@ impl LlamaTokenDataArray {
     /// the size of the data can only decrease (i.e you cannot add new elements).
     pub(crate) unsafe fn modify_as_c_llama_token_data_array<T>(
         &mut self,
-        modify: impl FnOnce(&mut llama_cpp_sys_2::llama_token_data_array) -> T,
+        modify: impl FnOnce(&mut llm_cpp::llama_token_data_array) -> T,
     ) -> T {
         let size = self.data.len();
         let data = self.data.as_mut_ptr().cast();
-        let mut c_llama_token_data_array = llama_cpp_sys_2::llama_token_data_array {
+        let mut c_llama_token_data_array = llm_cpp::llama_token_data_array {
             data,
             size,
             sorted: self.sorted,
@@ -104,9 +104,9 @@ impl LlamaTokenDataArray {
     ///
     /// ```rust
     /// # use std::collections::BTreeMap;
-    /// # use llama_cpp_2::token::data::LlamaTokenData;
-    /// # use llama_cpp_2::token::data_array::LlamaTokenDataArray;
-    /// # use llama_cpp_2::token::LlamaToken;
+    /// # use llm::token::data::LlamaTokenData;
+    /// # use llm::token::data_array::LlamaTokenDataArray;
+    /// # use llm::token::LlamaToken;
     /// let history = vec![
     ///   LlamaToken::new(2),
     ///   LlamaToken::new(1),
@@ -143,7 +143,7 @@ impl LlamaTokenDataArray {
         let penalty_last_n = min(penalty_last_n, last_tokens.len().saturating_sub(1));
         unsafe {
             self.modify_as_c_llama_token_data_array(|c_llama_token_data_array| {
-                llama_cpp_sys_2::llama_sample_repetition_penalties(
+                llm_cpp::llama_sample_repetition_penalties(
                     ctx,
                     c_llama_token_data_array,
                     // safe cast as LlamaToken is repr(transparent)
@@ -162,9 +162,9 @@ impl LlamaTokenDataArray {
     /// # Example
     ///
     /// ```rust
-    /// # use llama_cpp_2::token::data::LlamaTokenData;
-    /// # use llama_cpp_2::token::data_array::LlamaTokenDataArray;
-    /// # use llama_cpp_2::token::LlamaToken;
+    /// # use llm::token::data::LlamaTokenData;
+    /// # use llm::token::data_array::LlamaTokenDataArray;
+    /// # use llm::token::LlamaToken;
     ///
     /// let lowest = LlamaTokenData::new(LlamaToken::new(0), 0.1, 0.0);
     /// let middle = LlamaTokenData::new(LlamaToken::new(1), 0.2, 0.0);
@@ -189,7 +189,7 @@ impl LlamaTokenDataArray {
         unsafe {
             let ctx = ctx.map_or(ptr::null_mut(), |ctx| ctx.context.as_ptr());
             self.modify_as_c_llama_token_data_array(|c_llama_token_data_array| {
-                llama_cpp_sys_2::llama_sample_softmax(ctx, c_llama_token_data_array);
+                llm_cpp::llama_sample_softmax(ctx, c_llama_token_data_array);
             });
         }
     }
@@ -199,9 +199,9 @@ impl LlamaTokenDataArray {
     /// # Example
     ///
     /// ```rust
-    /// # use llama_cpp_2::token::data::LlamaTokenData;
-    /// # use llama_cpp_2::token::data_array::LlamaTokenDataArray;
-    /// # use llama_cpp_2::token::LlamaToken;
+    /// # use llm::token::data::LlamaTokenData;
+    /// # use llm::token::data_array::LlamaTokenDataArray;
+    /// # use llm::token::LlamaToken;
     ///
     /// let candidates = vec![
     ///     LlamaTokenData::new(LlamaToken::new(0), 0.1, 0.0),
@@ -223,7 +223,7 @@ impl LlamaTokenDataArray {
         let ctx = ctx.map_or(ptr::null_mut(), |ctx| ctx.context.as_ptr());
         unsafe {
             self.modify_as_c_llama_token_data_array(|c_llama_token_data_array| {
-                llama_cpp_sys_2::llama_sample_temp(ctx, c_llama_token_data_array, temperature);
+                llm_cpp::llama_sample_temp(ctx, c_llama_token_data_array, temperature);
             });
         }
     }
@@ -232,7 +232,7 @@ impl LlamaTokenDataArray {
     pub fn sample_token(&mut self, ctx: &mut LlamaContext) -> LlamaToken {
         let llama_token = unsafe {
             self.modify_as_c_llama_token_data_array(|c_llama_token_data_array| {
-                llama_cpp_sys_2::llama_sample_token(ctx.context.as_ptr(), c_llama_token_data_array)
+                llm_cpp::llama_sample_token(ctx.context.as_ptr(), c_llama_token_data_array)
             })
         };
         LlamaToken(llama_token)
@@ -243,7 +243,7 @@ impl LlamaTokenDataArray {
         let ctx = ctx.map_or(ptr::null_mut(), |ctx| ctx.context.as_ptr());
         unsafe {
             self.modify_as_c_llama_token_data_array(|c_llama_token_data_array| {
-                llama_cpp_sys_2::llama_sample_top_k(ctx, c_llama_token_data_array, k, min_keep);
+                llm_cpp::llama_sample_top_k(ctx, c_llama_token_data_array, k, min_keep);
             });
         }
     }
@@ -253,7 +253,7 @@ impl LlamaTokenDataArray {
         let ctx = ctx.map_or(ptr::null_mut(), |ctx| ctx.context.as_ptr());
         unsafe {
             self.modify_as_c_llama_token_data_array(|c_llama_token_data_array| {
-                llama_cpp_sys_2::llama_sample_tail_free(ctx, c_llama_token_data_array, z, min_keep);
+                llm_cpp::llama_sample_tail_free(ctx, c_llama_token_data_array, z, min_keep);
             });
         }
     }
@@ -264,9 +264,9 @@ impl LlamaTokenDataArray {
     ///
     /// ```rust
     ///
-    /// # use llama_cpp_2::token::data::LlamaTokenData;
-    /// # use llama_cpp_2::token::data_array::LlamaTokenDataArray;
-    /// # use llama_cpp_2::token::LlamaToken;
+    /// # use llm::token::data::LlamaTokenData;
+    /// # use llm::token::data_array::LlamaTokenDataArray;
+    /// # use llm::token::LlamaToken;
     ///
     /// let candidates = vec![
     ///    LlamaTokenData::new(LlamaToken::new(0), 0.1, 0.0),
@@ -281,7 +281,7 @@ impl LlamaTokenDataArray {
         let ctx = ctx.map_or(ptr::null_mut(), |ctx| ctx.context.as_ptr());
         unsafe {
             self.modify_as_c_llama_token_data_array(|c_llama_token_data_array| {
-                llama_cpp_sys_2::llama_sample_typical(ctx, c_llama_token_data_array, p, min_keep);
+                llm_cpp::llama_sample_typical(ctx, c_llama_token_data_array, p, min_keep);
             });
         }
     }
@@ -292,9 +292,9 @@ impl LlamaTokenDataArray {
     ///
     /// ```rust
     ///
-    /// # use llama_cpp_2::token::data::LlamaTokenData;
-    /// # use llama_cpp_2::token::data_array::LlamaTokenDataArray;
-    /// # use llama_cpp_2::token::LlamaToken;
+    /// # use llm::token::data::LlamaTokenData;
+    /// # use llm::token::data_array::LlamaTokenDataArray;
+    /// # use llm::token::LlamaToken;
     ///
     /// let candidates = vec![
     ///   LlamaTokenData::new(LlamaToken::new(0), 0.1, 0.0),
@@ -313,7 +313,7 @@ impl LlamaTokenDataArray {
         let ctx = ctx.map_or(ptr::null_mut(), |ctx| ctx.context.as_ptr());
         unsafe {
             self.modify_as_c_llama_token_data_array(|c_llama_token_data_array| {
-                llama_cpp_sys_2::llama_sample_top_p(ctx, c_llama_token_data_array, p, min_keep);
+                llm_cpp::llama_sample_top_p(ctx, c_llama_token_data_array, p, min_keep);
             });
         }
     }
@@ -323,9 +323,9 @@ impl LlamaTokenDataArray {
     /// # Example
     ///
     /// ```
-    /// # use llama_cpp_2::token::data::LlamaTokenData;
-    /// # use llama_cpp_2::token::data_array::LlamaTokenDataArray;
-    /// # use llama_cpp_2::token::LlamaToken;
+    /// # use llm::token::data::LlamaTokenData;
+    /// # use llm::token::data_array::LlamaTokenDataArray;
+    /// # use llm::token::LlamaToken;
     ///
     /// let candidates = vec![
     ///   LlamaTokenData::new(LlamaToken::new(4), 0.0001, 0.0),
@@ -340,7 +340,7 @@ impl LlamaTokenDataArray {
         let ctx = ctx.map_or(ptr::null_mut(), |ctx| ctx.context.as_ptr());
         unsafe {
             self.modify_as_c_llama_token_data_array(|c_llama_token_data_array| {
-                llama_cpp_sys_2::llama_sample_min_p(ctx, c_llama_token_data_array, p, min_keep);
+                llm_cpp::llama_sample_min_p(ctx, c_llama_token_data_array, p, min_keep);
             });
         }
     }
@@ -362,7 +362,7 @@ impl LlamaTokenDataArray {
         let mu_ptr = ptr::from_mut(mu);
         let token = unsafe {
             self.modify_as_c_llama_token_data_array(|c_llama_token_data_array| {
-                llama_cpp_sys_2::llama_sample_token_mirostat_v2(
+                llm_cpp::llama_sample_token_mirostat_v2(
                     ctx.context.as_ptr(),
                     c_llama_token_data_array,
                     tau,

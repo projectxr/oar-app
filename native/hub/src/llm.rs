@@ -1,16 +1,16 @@
 use crate::messages;
 use crate::tokio;
 use anyhow::Result;
-use llama_cpp_2::context::params::LlamaContextParams;
-//use llama_cpp_2::ggml_time_us;
+use llm::context::params::LlamaContextParams;
+//use llm::ggml_time_us;
 use build_target::Os;
-use llama_cpp_2::llama_backend::LlamaBackend;
-use llama_cpp_2::llama_batch::LlamaBatch;
-use llama_cpp_2::model::params::LlamaModelParams;
-use llama_cpp_2::model::LlamaModel;
-use llama_cpp_2::model::{AddBos, Special};
-use llama_cpp_2::token::data_array::LlamaTokenDataArray;
-use llama_cpp_2::token::LlamaToken;
+use llm::llama_backend::LlamaBackend;
+use llm::llama_batch::LlamaBatch;
+use llm::model::params::LlamaModelParams;
+use llm::model::LlamaModel;
+use llm::model::{AddBos, Special};
+use llm::token::data_array::LlamaTokenDataArray;
+use llm::token::LlamaToken;
 use std::io::Write;
 use std::num::NonZeroU32;
 use std::ops::Index;
@@ -35,7 +35,7 @@ pub async fn parse() {
     let n_len: i32 = 8192;
     let model: Model = Model::Local {
         path: PathBuf::from(
-             "/Users/prashantchoudhary/Library/Containers/com.example.app/Data/llama.gguf",
+            "/Users/prashantchoudhary/Library/Containers/com.example.app/Data/llama.gguf",
             //"/storage/emulated/0/Download/llama.gguf",
         ),
     };

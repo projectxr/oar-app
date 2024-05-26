@@ -7,10 +7,10 @@
 //! **Llama.cpp default sampler**
 //!
 //! ```rust
-//! use llama_cpp_2::context::sample::sampler::{Sampler, SampleStep};
-//! use llama_cpp_2::token::data::LlamaTokenData;
-//! use llama_cpp_2::token::data_array::LlamaTokenDataArray;
-//! use llama_cpp_2::token::LlamaToken;
+//! use llm::context::sample::sampler::{Sampler, SampleStep};
+//! use llm::token::data::LlamaTokenData;
+//! use llm::token::data_array::LlamaTokenDataArray;
+//! use llm::token::LlamaToken;
 //!
 //! // Sample a token greedily and add to the history.
 //! let mut finalizer = &|mut canidates: LlamaTokenDataArray, history: &mut Vec<LlamaToken>| {

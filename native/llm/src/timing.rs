@@ -4,13 +4,13 @@ use std::fmt::{Debug, Display, Formatter};
 /// A wrapper around `llama_timings`.
 #[derive(Clone, Copy, Debug)]
 pub struct LlamaTimings {
-    pub(crate) timings: llama_cpp_sys_2::llama_timings,
+    pub(crate) timings: llm_cpp::llama_timings,
 }
 
 impl LlamaTimings {
     /// Create a new `LlamaTimings`.
     /// ```
-    /// # use llama_cpp_2::timing::LlamaTimings;
+    /// # use llm::timing::LlamaTimings;
     /// let timings = LlamaTimings::new(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7, 8, 9);
     /// let timings_str = "load time = 3.00 ms
     /// sample time = 4.00 ms / 7 runs (0.57 ms per token, 1750.00 tokens per second)
@@ -33,7 +33,7 @@ impl LlamaTimings {
         n_eval: i32,
     ) -> Self {
         Self {
-            timings: llama_cpp_sys_2::llama_timings {
+            timings: llm_cpp::llama_timings {
                 t_start_ms,
                 t_end_ms,
                 t_load_ms,

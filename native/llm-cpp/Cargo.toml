@@ -1,5 +1,5 @@
 [package]
-name = "llama-cpp-sys-2"
+name = "llm-cpp"
 description = "Low Level Bindings to llama.cpp"
 version = "0.1.52"
 edition = "2021"

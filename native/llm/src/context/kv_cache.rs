@@ -13,7 +13,7 @@ impl LlamaContext<'_> {
     /// * `dest` - The sequence id to copy the cache to.
     /// * `size` - The size of the cache to copy.
     pub fn copy_cache(&mut self, src: i32, dest: i32, size: i32) {
-        unsafe { llama_cpp_sys_2::llama_kv_cache_seq_cp(self.context.as_ptr(), src, dest, 0, size) }
+        unsafe { llm_cpp::llama_kv_cache_seq_cp(self.context.as_ptr(), src, dest, 0, size) }
     }
 
     /// Copy the cache from one sequence to another.
@@ -28,7 +28,7 @@ impl LlamaContext<'_> {
         let p0 = p0.map_or(-1, i32::from);
         let p1 = p1.map_or(-1, i32::from);
         unsafe {
-            llama_cpp_sys_2::llama_kv_cache_seq_cp(self.context.as_ptr(), src, dest, p0, p1);
+            llm_cpp::llama_kv_cache_seq_cp(self.context.as_ptr(), src, dest, p0, p1);
         }
     }
 
@@ -43,19 +43,19 @@ impl LlamaContext<'_> {
         let p0 = p0.map_or(-1, i32::from);
         let p1 = p1.map_or(-1, i32::from);
         unsafe {
-            llama_cpp_sys_2::llama_kv_cache_seq_rm(self.context.as_ptr(), src, p0, p1);
+            llm_cpp::llama_kv_cache_seq_rm(self.context.as_ptr(), src, p0, p1);
         }
     }
 
     /// Returns the number of used KV cells (i.e. have at least one sequence assigned to them)
     #[must_use]
     pub fn get_kv_cache_used_cells(&self) -> i32 {
-        unsafe { llama_cpp_sys_2::llama_get_kv_cache_used_cells(self.context.as_ptr()) }
+        unsafe { llm_cpp::llama_get_kv_cache_used_cells(self.context.as_ptr()) }
     }
 
     /// Clear the KV cache
     pub fn clear_kv_cache(&mut self) {
-        unsafe { llama_cpp_sys_2::llama_kv_cache_clear(self.context.as_ptr()) }
+        unsafe { llm_cpp::llama_kv_cache_clear(self.context.as_ptr()) }
     }
 
     /// Removes all tokens that do not belong to the specified sequence
@@ -64,7 +64,7 @@ impl LlamaContext<'_> {
     ///
     /// * `seq_id` - The sequence id to keep
     pub fn llama_kv_cache_seq_keep(&mut self, seq_id: i32) {
-        unsafe { llama_cpp_sys_2::llama_kv_cache_seq_keep(self.context.as_ptr(), seq_id) }
+        unsafe { llm_cpp::llama_kv_cache_seq_keep(self.context.as_ptr(), seq_id) }
     }
 
     #[allow(clippy::doc_markdown)]
@@ -83,7 +83,7 @@ impl LlamaContext<'_> {
         let p0 = p0.map_or(-1, i32::from);
         let p1 = p1.map_or(-1, i32::from);
         unsafe {
-            llama_cpp_sys_2::llama_kv_cache_seq_add(self.context.as_ptr(), seq_id, p0, p1, delta);
+            llm_cpp::llama_kv_cache_seq_add(self.context.as_ptr(), seq_id, p0, p1, delta);
         }
     }
 
@@ -108,7 +108,7 @@ impl LlamaContext<'_> {
         let p0 = p0.map_or(-1, i32::from);
         let p1 = p1.map_or(-1, i32::from);
         let d = c_int::from(d.get());
-        unsafe { llama_cpp_sys_2::llama_kv_cache_seq_div(self.context.as_ptr(), seq_id, p0, p1, d) }
+        unsafe { llm_cpp::llama_kv_cache_seq_div(self.context.as_ptr(), seq_id, p0, p1, d) }
     }
 
     /// Returns the largest position present in the KV cache for the specified sequence
@@ -118,7 +118,7 @@ impl LlamaContext<'_> {
     /// * `seq_id` - The sequence id to get the max position for
     #[must_use]
     pub fn kv_cache_seq_pos_max(&self, seq_id: i32) -> i32 {
-        unsafe { llama_cpp_sys_2::llama_kv_cache_seq_pos_max(self.context.as_ptr(), seq_id) }
+        unsafe { llm_cpp::llama_kv_cache_seq_pos_max(self.context.as_ptr(), seq_id) }
     }
 
     /// Defragment the KV cache
@@ -126,19 +126,19 @@ impl LlamaContext<'_> {
     ///   - lazily on next [`LlamaContext::decode`]
     ///   - explicitly with [`Self::kv_cache_update`]
     pub fn kv_cache_defrag(&mut self) {
-        unsafe { llama_cpp_sys_2::llama_kv_cache_defrag(self.context.as_ptr()) }
+        unsafe { llm_cpp::llama_kv_cache_defrag(self.context.as_ptr()) }
     }
 
     /// Apply the KV cache updates (such as K-shifts, defragmentation, etc.)
     pub fn kv_cache_update(&mut self) {
-        unsafe { llama_cpp_sys_2::llama_kv_cache_update(self.context.as_ptr()) }
+        unsafe { llm_cpp::llama_kv_cache_update(self.context.as_ptr()) }
     }
 
     /// Returns the number of tokens in the KV cache (slow, use only for debug)
     /// If a KV cell has multiple sequences assigned to it, it will be counted multiple times
     #[must_use]
     pub fn get_kv_cache_token_count(&self) -> i32 {
-        unsafe { llama_cpp_sys_2::llama_get_kv_cache_token_count(self.context.as_ptr()) }
+        unsafe { llm_cpp::llama_get_kv_cache_token_count(self.context.as_ptr()) }
     }
 
     /// Create an empty KV cache view. (use only for debugging purposes)
@@ -151,7 +151,7 @@ impl LlamaContext<'_> {
     #[must_use]
     pub fn new_kv_cache_view(&self, n_max_seq: i32) -> KVCacheView {
         let view =
-            unsafe { llama_cpp_sys_2::llama_kv_cache_view_init(self.context.as_ptr(), n_max_seq) };
+            unsafe { llm_cpp::llama_kv_cache_view_init(self.context.as_ptr(), n_max_seq) };
         KVCacheView { view, ctx: self }
     }
 }
@@ -161,21 +161,21 @@ impl LlamaContext<'_> {
 pub struct KVCacheViewCell {
     /// The position for this cell. Takes KV cache shifts into account.
     /// May be negative if the cell is not populated.
-    pub pos: llama_cpp_sys_2::llama_pos,
+    pub pos: llm_cpp::llama_pos,
 }
 
 /// An updateable view of the KV cache. (use only for debugging purposes)
 #[derive(Debug)]
 pub struct KVCacheView<'a> {
     ctx: &'a LlamaContext<'a>,
-    view: llama_cpp_sys_2::llama_kv_cache_view,
+    view: llm_cpp::llama_kv_cache_view,
 }
 
 impl<'a> KVCacheView<'a> {
     /// Update the KV cache view structure with the current state of the KV cache. (use only for debugging purposes)
     pub fn update(&mut self) {
         unsafe {
-            llama_cpp_sys_2::llama_kv_cache_view_update(self.ctx.context.as_ptr(), &mut self.view);
+            llm_cpp::llama_kv_cache_view_update(self.ctx.context.as_ptr(), &mut self.view);
         }
     }
 
@@ -234,7 +234,7 @@ impl<'a> KVCacheView<'a> {
     ///
     /// - if `n_cells * n_max_seq` does not fit into usize.
     /// - if `n_max_seq` does not fit into usize.
-    pub fn cells_sequences(&self) -> impl Iterator<Item = &[llama_cpp_sys_2::llama_seq_id]> {
+    pub fn cells_sequences(&self) -> impl Iterator<Item = &[llm_cpp::llama_seq_id]> {
         unsafe {
             std::slice::from_raw_parts(
                 self.view.cells_sequences,
@@ -249,7 +249,7 @@ impl<'a> KVCacheView<'a> {
 impl<'a> Drop for KVCacheView<'a> {
     fn drop(&mut self) {
         unsafe {
-            llama_cpp_sys_2::llama_kv_cache_view_free(&mut self.view);
+            llm_cpp::llama_kv_cache_view_free(&mut self.view);
         }
     }
 }

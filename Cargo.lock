@@ -621,7 +621,7 @@ dependencies = [
  "build-target",
  "clap",
  "encoding_rs",
- "llama-cpp-2",
+ "llm",
  "pdf",
  "prost",
  "rinf",
@@ -775,16 +775,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "01cda141df6706de531b6c46c3a33ecca755538219bd484262fa09410c13539c"
 
 [[package]]
-name = "llama-cpp-2"
+name = "llm"
 version = "0.1.52"
 dependencies = [
- "llama-cpp-sys-2",
+ "llm-cpp",
  "thiserror",
  "tracing",
 ]
 
 [[package]]
-name = "llama-cpp-sys-2"
+name = "llm-cpp"
 version = "0.1.52"
 dependencies = [
  "bindgen",

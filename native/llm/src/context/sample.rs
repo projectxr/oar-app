@@ -12,7 +12,7 @@ impl LlamaContext<'_> {
     /// Accept a token into the grammar.
     pub fn grammar_accept_token(&mut self, grammar: &mut LlamaGrammar, token: LlamaToken) {
         unsafe {
-            llama_cpp_sys_2::llama_grammar_accept_token(
+            llm_cpp::llama_grammar_accept_token(
                 self.context.as_ptr(),
                 grammar.grammar.as_ptr(),
                 token.0,
@@ -28,7 +28,7 @@ impl LlamaContext<'_> {
     ) {
         unsafe {
             llama_token_data_array.modify_as_c_llama_token_data_array(|c_llama_token_data_array| {
-                llama_cpp_sys_2::llama_sample_grammar(
+                llm_cpp::llama_sample_grammar(
                     self.context.as_ptr(),
                     c_llama_token_data_array,
                     llama_grammar.grammar.as_ptr(),
@@ -52,16 +52,16 @@ impl LlamaContext<'_> {
     #[must_use]
     pub fn sample_token_greedy(&mut self, mut token_data: LlamaTokenDataArray) -> LlamaToken {
         assert!(!token_data.data.is_empty(), "no tokens");
-        let mut data_arr = llama_cpp_sys_2::llama_token_data_array {
+        let mut data_arr = llm_cpp::llama_token_data_array {
             data: token_data
                 .data
                 .as_mut_ptr()
-                .cast::<llama_cpp_sys_2::llama_token_data>(),
+                .cast::<llm_cpp::llama_token_data>(),
             size: token_data.data.len(),
             sorted: token_data.sorted,
         };
         let token = unsafe {
-            llama_cpp_sys_2::llama_sample_token_greedy(
+            llm_cpp::llama_sample_token_greedy(
                 self.context.as_ptr(),
                 std::ptr::addr_of_mut!(data_arr),
             )
@@ -74,17 +74,17 @@ impl LlamaContext<'_> {
         mut token_data: LlamaTokenDataArray,
     ) -> LlamaToken {
         assert!(!token_data.data.is_empty(), "no tokens");
-        let mut data_arr = llama_cpp_sys_2::llama_token_data_array {
+        let mut data_arr = llm_cpp::llama_token_data_array {
             data: token_data
                 .data
                 .as_mut_ptr()
-                .cast::<llama_cpp_sys_2::llama_token_data>(),
+                .cast::<llm_cpp::llama_token_data>(),
             size: token_data.data.len(),
             sorted: token_data.sorted,
         };
         let microstat_mu: *mut f32 = &mut 0.0;
         let token = unsafe {
-            llama_cpp_sys_2::llama_sample_token_mirostat_v2(
+            llm_cpp::llama_sample_token_mirostat_v2(
                 self.context.as_ptr(),
                 std::ptr::addr_of_mut!(data_arr),
                 4.0,
@@ -130,7 +130,7 @@ impl LlamaContext<'_> {
         let ctx = self.context.as_ptr();
         unsafe {
             llama_token_data.modify_as_c_llama_token_data_array(|c_llama_token_data_array| {
-                llama_cpp_sys_2::llama_sample_min_p(ctx, c_llama_token_data_array, p, min_keep);
+                llm_cpp::llama_sample_min_p(ctx, c_llama_token_data_array, p, min_keep);
             });
         }
     }

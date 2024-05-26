@@ -36,7 +36,7 @@ pub async fn parse() {
     let model: Model = Model::Local {
         path: PathBuf::from(
             "/Users/prashantchoudhary/Library/Containers/com.example.app/Data/llama.gguf",
-            //"/storage/emulated/0/Download/llama.gguf",
+            // "/storage/emulated/0/Download/llama.gguf",
         ),
     };
     let ctx_size: Option<NonZeroU32> = NonZeroU32::new(8192);
@@ -77,7 +77,7 @@ pub async fn parse() {
             let ctx_params = LlamaContextParams::default()
                 .with_n_ctx(ctx_size)
                 .with_n_batch(8192)
-                .with_n_ubatch(256)
+                .with_n_ubatch(128)
                 .with_seed(1234)
                 .with_n_threads(4);
 

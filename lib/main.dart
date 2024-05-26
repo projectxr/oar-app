@@ -24,9 +24,15 @@ class _MyAppState extends State<MyApp> {
   late TextEditingController _promptController;
   late Map<int, String> messages = Map.from({0: ""});
   int currentMessageId = 0;
+  int copyCurrentMessageId = 0;
   String _path = "";
   bool _enabled = true;
   final ScrollController _scrollController = ScrollController();
+  late List<String> _mySomething = [
+    "You're a Young Inspired personal Assistant who loves to help!",
+    "You're a Marketing Manager who has done well in the professional career, very helpful and knowledgeable!",
+    "You're the best programmer in Rust and Flutter (Dart) and write neat code!"
+  ];
 
   @override
   void initState() {
@@ -35,9 +41,16 @@ class _MyAppState extends State<MyApp> {
     //takePermission();
     LlmReady.rustSignalStream.listen((readyData) {
       if (readyData.message.ready) {
-        LlmRequest(prompt: "Hello").sendSignalToRust();
+        LlmRequest(prompt: _mySomething[2]).sendSignalToRust();
         setState(() {
           _path = readyData.message.data;
+        });
+      }
+    });
+    LlmResult.rustSignalStream.listen((data) {
+      if (data.message.messageId != copyCurrentMessageId) {
+        setState(() {
+          _enabled = true;
         });
       }
     });
@@ -91,19 +104,17 @@ class _MyAppState extends State<MyApp> {
                           return Text("Loading usually takes a few minutes! $_path");
                         }
                         final llmResponse = rustSignal.message;
+
                         if (currentMessageId != llmResponse.messageId) {
                           currentMessageId = llmResponse.messageId;
-                          setState(() {
-                            _enabled = true;
-                          });
-                          messages.putIfAbsent(llmResponse.messageId, () => "");
+                          messages.addAll({llmResponse.messageId: ""});
                         }
 
                         messages.update(
                             llmResponse.messageId, (currVal) => '$currVal${llmResponse.response}');
                         _scrollController.animateTo(
                           _scrollController.position.maxScrollExtent,
-                          duration: Duration(milliseconds: 500),
+                          duration: Duration(milliseconds: 200),
                           curve: Curves.easeOut,
                         );
                         return Column(

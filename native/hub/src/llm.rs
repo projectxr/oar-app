@@ -1,5 +1,4 @@
 use crate::messages;
-use crate::messages::llm::LlmReady;
 use crate::tokio;
 use anyhow::Result;
 use llama_cpp_2::context::params::LlamaContextParams;
@@ -14,6 +13,7 @@ use llama_cpp_2::token::data_array::LlamaTokenDataArray;
 use llama_cpp_2::token::LlamaToken;
 use std::io::Write;
 use std::num::NonZeroU32;
+use std::ops::Index;
 use std::path::PathBuf;
 
 #[derive(clap::Subcommand, Debug, Clone)]
@@ -32,11 +32,11 @@ impl Model {
 }
 
 pub async fn parse() {
-    let n_len = 8192;
+    let n_len: i32 = 8192;
     let model: Model = Model::Local {
         path: PathBuf::from(
-            //"/Users/prashantchoudhary/Library/Containers/com.example.app/Data/llama.gguf",
-            "/storage/emulated/0/llama.gguf",
+             "/Users/prashantchoudhary/Library/Containers/com.example.app/Data/llama.gguf",
+            //"/storage/emulated/0/Download/llama.gguf",
         ),
     };
     let ctx_size: Option<NonZeroU32> = NonZeroU32::new(8192);
@@ -75,8 +75,11 @@ pub async fn parse() {
             .join("\n\n");
 
             let ctx_params = LlamaContextParams::default()
-                .with_n_ctx(ctx_size.or(Some(NonZeroU32::new(4096).unwrap())))
-                .with_seed(1234);
+                .with_n_ctx(ctx_size)
+                .with_n_batch(8192)
+                .with_n_ubatch(256)
+                .with_seed(1234)
+                .with_n_threads(4);
 
             let mut ctx = model
                 .new_context(&backend, ctx_params)
@@ -85,6 +88,25 @@ pub async fn parse() {
             let tokens_list = model
                 .str_to_token(&prompt, AddBos::Always)
                 .expect(format!("failed to tokenize {prompt}").as_str());
+
+            //TODO: Research context extension in DEPTH!
+            eprintln!("{} {}", sampling_token_list.len(), tokens_list.len());
+            if sampling_token_list.len() + tokens_list.len()
+                >= usize::try_from(n_len).expect("Length not available")
+            {
+                let save_size: i32 = n_len / 4;
+                eprintln!("{} {}", save_size, n_len);
+                sampling_token_list = sampling_token_list
+                    .split_at(usize::try_from(save_size).expect(""))
+                    .0
+                    .to_vec();
+                sampling_token_list.append(
+                    &mut sampling_token_list
+                        .split_at(usize::try_from(3 * save_size).expect(""))
+                        .1
+                        .to_vec(),
+                );
+            }
             sampling_token_list.append(&mut tokens_list.clone());
 
             let n_cxt = ctx.n_ctx() as i32;
@@ -97,11 +119,6 @@ pub async fn parse() {
                 break;
             }
 
-            // if sampling_token_list.len() >= usize::try_from(n_len).expect("Length not available") {
-            //     eprintln!("the prompt is too long, it has more tokens than n_len");
-            //     break;
-            // }
-
             // for token in &sampling_token_list {
             //     eprint!(
             //         "{}",
@@ -112,13 +129,13 @@ pub async fn parse() {
             // }
 
             std::io::stderr().flush().expect("Flush error");
-            let mut batch = LlamaBatch::new(4096, 1);
+            let mut batch = LlamaBatch::new(8192, 1);
 
             let last_index: i32 = (sampling_token_list.len() - 1) as i32;
-            for (i, token) in (0_i32..).zip(sampling_token_list.clone().into_iter()) {
+            for (i, token) in (0_i32..).zip(&sampling_token_list) {
                 let is_last = i == last_index;
                 batch
-                    .add(token, i, &[0], is_last)
+                    .add(*token, i, &[0], is_last)
                     .expect("Error in adding to batch");
             }
 
@@ -134,9 +151,33 @@ pub async fn parse() {
                 {
                     let candidates = ctx.candidates_ith(batch.n_tokens() - 1);
 
-                    let candidates_p = LlamaTokenDataArray::from_iter(candidates, false);
+                    let mut candidates_p = LlamaTokenDataArray::from_iter(candidates, false);
 
-                    let new_token_id = ctx.llama_sample_token_mirostat_v2(candidates_p);
+                    candidates_p.sample_repetition_penalty(
+                        None,
+                        &sampling_token_list,
+                        64,
+                        1.1,
+                        0.0,
+                        0.0,
+                    );
+
+                    ctx.sample_top_k(&mut candidates_p, 40, 1);
+
+                    ctx.sample_tail_free(&mut candidates_p, 1.0, 1);
+
+                    ctx.sample_typical(&mut candidates_p, 1.0, 1);
+
+                    ctx.sample_top_p(&mut candidates_p, 0.950, 1);
+
+                    ctx.sample_min_p(&mut candidates_p, 0.05, 1);
+
+                    ctx.sample_temp(&mut candidates_p, 0.1);
+
+                    //ctx.sample_token_softmax(&mut candidates_p);
+                    //let new_token_id = ctx.llama_sample_token_mirostat_v2(candidates_p);
+                    let new_token_id = candidates_p.data[0].id();
+
                     sampling_token_list.push(new_token_id);
                     if new_token_id == model.token_eos() || new_token_id == model.token_eot() {
                         eprintln!();

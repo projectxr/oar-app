@@ -104,6 +104,7 @@ class _MyAppState extends State<MyApp> {
                           return Text("Loading usually takes a few minutes! $_path");
                         }
                         final llmResponse = rustSignal.message;
+
                         if (currentMessageId != llmResponse.messageId) {
                           currentMessageId = llmResponse.messageId;
                           setState(() {

@@ -31,7 +31,7 @@ class _MyAppState extends State<MyApp> {
   late List<String> _mySomething = [
     "You're a Young Inspired personal Assistant who loves to help!",
     "You're a Marketing Manager who has done well in the professional career, very helpful and knowledgeable!",
-    "You're the best programmer in Rust and Flutter (Dart) and write neat code!"
+    "You're the best programmer in Rust and Flutter (Dart) and write neat code! You're here to help!"
   ];
 
   @override

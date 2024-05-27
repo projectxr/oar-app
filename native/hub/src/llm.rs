@@ -2,8 +2,7 @@ use crate::messages;
 use crate::tokio;
 use anyhow::Result;
 use llm::context::params::LlamaContextParams;
-//use llm::ggml_time_us;
-use build_target::Os;
+use llm::ggml_time_us;
 use llm::llama_backend::LlamaBackend;
 use llm::llama_batch::LlamaBatch;
 use llm::model::params::LlamaModelParams;
@@ -15,6 +14,7 @@ use std::io::Write;
 use std::num::NonZeroU32;
 use std::ops::Index;
 use std::path::PathBuf;
+use std::time::Duration;
 
 #[derive(clap::Subcommand, Debug, Clone)]
 
@@ -33,11 +33,16 @@ impl Model {
 
 pub async fn parse() {
     let n_len: i32 = 8192;
+    eprintln!("{}", cfg!(target_os = "android"));
+    let path = if cfg!(target_os = "android") {
+        "/storage/emulated/0/Download/llama.gguf"
+    } else if cfg!(target_os = "macos") {
+        "/Users/prashantchoudhary/Library/Containers/com.example.app/Data/llava.gguf"
+    } else {
+        "./llama.gguf"
+    };
     let model: Model = Model::Local {
-        path: PathBuf::from(
-            "/Users/prashantchoudhary/Library/Containers/com.example.app/Data/llama.gguf",
-            // "/storage/emulated/0/Download/llama.gguf",
-        ),
+        path: PathBuf::from(path),
     };
     let ctx_size: Option<NonZeroU32> = NonZeroU32::new(8192);
     // init LLM
@@ -77,7 +82,7 @@ pub async fn parse() {
             let ctx_params = LlamaContextParams::default()
                 .with_n_ctx(ctx_size)
                 .with_n_batch(8192)
-                .with_n_ubatch(128)
+                .with_n_ubatch(256)
                 .with_seed(1234)
                 .with_n_threads(4);
 
@@ -142,9 +147,9 @@ pub async fn parse() {
             ctx.decode(&mut batch).expect("llama_decode() failed");
 
             let mut n_cur = batch.n_tokens();
-            // let mut n_decode = 0;
+            let mut n_decode = 0;
 
-            // let t_main_start = ggml_time_us();
+            let t_main_start = ggml_time_us();
 
             let mut decoder = encoding_rs::UTF_8.new_decoder();
             while n_cur <= n_len {
@@ -162,7 +167,7 @@ pub async fn parse() {
                         0.0,
                     );
 
-                    ctx.sample_top_k(&mut candidates_p, 40, 1);
+                    ctx.sample_top_k(&mut candidates_p, 30, 1);
 
                     ctx.sample_tail_free(&mut candidates_p, 1.0, 1);
 
@@ -172,9 +177,9 @@ pub async fn parse() {
 
                     ctx.sample_min_p(&mut candidates_p, 0.05, 1);
 
-                    ctx.sample_temp(&mut candidates_p, 0.1);
+                    ctx.sample_temp(&mut candidates_p, 0.7);
 
-                    //ctx.sample_token_softmax(&mut candidates_p);
+                    ctx.sample_token_softmax(&mut candidates_p);
                     //let new_token_id = ctx.llama_sample_token_mirostat_v2(candidates_p);
                     let new_token_id = candidates_p.data[0].id();
 
@@ -206,24 +211,23 @@ pub async fn parse() {
 
                 ctx.decode(&mut batch).expect("failed to eval");
 
-                //n_decode += 1;
+                n_decode += 1;
             }
+            eprintln!("\n");
+
+            let t_main_end = ggml_time_us();
+
+            let duration = Duration::from_micros((t_main_end - t_main_start) as u64);
+
+            eprintln!(
+                "decoded {} tokens in {:.2} s, speed {:.2} t/s\n",
+                n_decode,
+                duration.as_secs_f32(),
+                n_decode as f32 / duration.as_secs_f32()
+            );
+
+            println!("{}", ctx.timings());
             message_id = message_id + 1;
         }
     });
-
-    // eprintln!("\n");
-
-    // let t_main_end = ggml_time_us();
-
-    // let duration = Duration::from_micros((t_main_end - t_main_start) as u64);
-
-    // eprintln!(
-    //     "decoded {} tokens in {:.2} s, speed {:.2} t/s\n",
-    //     n_decode,
-    //     duration.as_secs_f32(),
-    //     n_decode as f32 / duration.as_secs_f32()
-    // );
-
-    // println!("{}", ctx.timings());
 }
